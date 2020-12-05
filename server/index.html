@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>server</title> 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+</head>
+<body>
+
+    <h1>this is a demo project Dihan</h1>
+    <form action="/addProduct" method="post" >
+        <input type="text" placeholder="name" name="name" id="name">
+        <input type="text" placeholder="price" name="price" id="price">
+        <input type="text" placeholder="quantity" name="quantity" id="quantity">
+        <select name="select">
+                <option value="Nahid">Nahid</option> 
+                <option value="Murad" >Murad</option>
+                <option value="Abir">Abir</option>
+            </select>
+        <button type="submit">Submit here</button>
+    </form>
+
+    <div id="container">
+        <h4 type="text" name="" id="inputname"></h4>
+    </div>
+
+    <div id="update">
+
+    </div>
+
+
+
+
+    <script>
+        function loadproducts() {
+
+            fetch('/products')
+        .then(res => res.json())
+        .then(data =>{
+            const products = document.getElementById('container')
+            const inputname = document.getElementById('inputname')
+
+            inputname.innerHTML = ''; 
+
+            data.forEach(pd => {
+
+                const items = document.createElement('p')
+                items.innerHTML = `<h4>Name:  ${pd.name} || select: ${pd.select} || Price:  ${pd.price} || ${pd.quantity} <button onclick = "deleteProdyct(event,'${pd._id}')">delete</button>  <button onclick = "updateProduct('${pd._id}')">Update</button>
+                     </h4> `;
+                inputname.appendChild(items);
+                
+            });
+
+        })
+
+        }
+        loadproducts()
+        
+
+        function updateProduct(id){
+            
+            fetch(`/product/${id}`)
+            .then(res => res.json())
+            .then(result =>{
+               var update = document.getElementById('update');
+               update.innerHTML = `
+                    <h2>Name ${result.name} </h2>
+                    <input type="text" name="Name" palceholder="name" value="${result.name}" id="name1">
+                    <input type="text" name="quantity" palceholder="quantity" value="${result.quantity}" id="quantity1">
+                    <input type="text" name="Price" palceholder="price" value="${result.price}" id="price1">
+                    <button type="submit" onclick="updateProductsingle('${id}')">Submit here</button>
+               `
+            })
+        }
+
+
+        function updateProductsingle(id){
+            const price = document.getElementById('price1').value;
+            const quantity = document.getElementById('quantity1').value;
+            const product = { id, price, quantity}
+            console.log('hit inside', product)
+
+
+
+            fetch(`/update/${id}`,{
+                method: 'PATCH',
+                headers: {'content-type': 'application/json'},
+                body: JSON.stringify(product),
+            })
+            .then(res => res.json())
+            .then(result =>{
+                loadproducts()
+            })
+
+
+        }
+
+
+
+        function deleteProdyct(event, id){
+            console.log(event)
+            fetch(`/delete/${id}`,{
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(result =>{
+                event.target.parentNode.style.display = 'none'
+            })
+        }
+
+
+    </script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    
+</body>
+</html>
